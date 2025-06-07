@@ -18,6 +18,7 @@ enum class TokenType {
 
     // Keywords
     KW_INT, KW_RETURN,
+    KW_IF, KW_WHILE,
 
     END_OF_FILE,
     INVALID
