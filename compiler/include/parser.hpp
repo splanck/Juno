@@ -29,6 +29,7 @@ private:
     std::unique_ptr<Stmt> parseReturn();
     std::unique_ptr<Stmt> parseExprStmt();
     std::unique_ptr<BlockStmt> parseBlock();
+    Type parseType();
     std::unique_ptr<Expr> parseExpression();
     std::unique_ptr<Expr> parseAdd();
     std::unique_ptr<Expr> parseMul();

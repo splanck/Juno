@@ -5,6 +5,7 @@
 #include <memory>
 #include <string>
 #include <vector>
+#include "types.hpp"
 
 namespace mylang {
 
@@ -26,6 +27,7 @@ struct Program : ASTNode {
 
 // Function declaration
 struct FunctionDecl : ASTNode {
+    Type returnType{};
     std::string name;
     std::unique_ptr<Stmt> body; // BlockStmt
     void dump(std::ostream &os, int indent = 0) const override;
@@ -40,6 +42,7 @@ struct BlockStmt : Stmt {
 };
 
 struct VarDecl : Stmt {
+    Type varType{};
     std::string name;
     std::unique_ptr<Expr> init;
     void dump(std::ostream &os, int indent = 0) const override;
