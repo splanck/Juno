@@ -34,12 +34,13 @@ std::unique_ptr<Program> Parser::parseProgram() {
 }
 
 std::unique_ptr<FunctionDecl> Parser::parseFunction() {
-    match(TokenType::KW_INT); // only int for now
+    Type retType = parseType();
     Token nameTok = advance(); // identifier
     match(TokenType::LEFT_PAREN);
     match(TokenType::RIGHT_PAREN);
     auto body = parseBlock();
     auto fn = std::make_unique<FunctionDecl>();
+    fn->returnType = retType;
     fn->name = nameTok.lexeme;
     fn->body = std::move(body);
     return fn;
@@ -55,14 +56,23 @@ std::unique_ptr<BlockStmt> Parser::parseBlock() {
     return block;
 }
 
+Type Parser::parseType() {
+    if (match(TokenType::KW_INT)) return Type::Int;
+    if (match(TokenType::KW_FLOAT)) return Type::Float;
+    if (match(TokenType::KW_STRING)) return Type::String;
+    if (match(TokenType::KW_VOID)) return Type::Void;
+    return Type::Int;
+}
+
 std::unique_ptr<Stmt> Parser::parseStatement() {
-    if (check(TokenType::KW_INT)) return parseVarDecl();
+    if (check(TokenType::KW_INT) || check(TokenType::KW_FLOAT) || check(TokenType::KW_STRING))
+        return parseVarDecl();
     if (check(TokenType::KW_RETURN)) return parseReturn();
     return parseExprStmt();
 }
 
 std::unique_ptr<Stmt> Parser::parseVarDecl() {
-    match(TokenType::KW_INT);
+    Type varType = parseType();
     Token nameTok = advance(); // identifier
     std::unique_ptr<Expr> init;
     if (match(TokenType::EQUAL)) {
@@ -70,6 +80,7 @@ std::unique_ptr<Stmt> Parser::parseVarDecl() {
     }
     match(TokenType::SEMICOLON);
     auto decl = std::make_unique<VarDecl>();
+    decl->varType = varType;
     decl->name = nameTok.lexeme;
     decl->init = std::move(init);
     return decl;
@@ -155,7 +166,7 @@ void Program::dump(std::ostream &os, int indent) const {
 }
 
 void FunctionDecl::dump(std::ostream &os, int indent) const {
-    printIndent(os, indent); os << "FunctionDecl " << name << "\n";
+    printIndent(os, indent); os << "FunctionDecl " << name << " : " << typeToString(returnType) << "\n";
     if (body) body->dump(os, indent + 2);
 }
 
@@ -165,7 +176,7 @@ void BlockStmt::dump(std::ostream &os, int indent) const {
 }
 
 void VarDecl::dump(std::ostream &os, int indent) const {
-    printIndent(os, indent); os << "VarDecl " << name << "\n";
+    printIndent(os, indent); os << "VarDecl " << name << " : " << typeToString(varType) << "\n";
     if (init) init->dump(os, indent + 2);
 }
 

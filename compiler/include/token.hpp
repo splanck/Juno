@@ -17,7 +17,8 @@ enum class TokenType {
     IDENTIFIER, NUMBER, STRING,
 
     // Keywords
-    KW_INT, KW_RETURN,
+    KW_INT, KW_FLOAT, KW_STRING, KW_VOID,
+    KW_RETURN,
     KW_IF, KW_WHILE,
 
     END_OF_FILE,

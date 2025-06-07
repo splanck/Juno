@@ -47,6 +47,12 @@ std::vector<Token> Lexer::tokenize() {
             std::string text = source.substr(start, current - start);
             if (text == "int") {
                 tokens.push_back(makeToken(TokenType::KW_INT, text));
+            } else if (text == "float") {
+                tokens.push_back(makeToken(TokenType::KW_FLOAT, text));
+            } else if (text == "string") {
+                tokens.push_back(makeToken(TokenType::KW_STRING, text));
+            } else if (text == "void") {
+                tokens.push_back(makeToken(TokenType::KW_VOID, text));
             } else if (text == "return") {
                 tokens.push_back(makeToken(TokenType::KW_RETURN, text));
             } else if (text == "if") {
