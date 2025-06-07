@@ -2,6 +2,8 @@
 #include <iostream>
 #include <sstream>
 #include "lexer.hpp"
+#include "parser.hpp"
+#include "semantic.hpp"
 
 using namespace mylang;
 
@@ -22,9 +24,16 @@ int main(int argc, char **argv) {
     Lexer lexer(source);
     auto tokens = lexer.tokenize();
 
-    for (const auto &tok : tokens) {
-        std::cout << static_cast<int>(tok.type) << "\t" << tok.lexeme << "\n";
+    Parser parser(tokens);
+    auto program = parser.parseProgram();
+
+    SemanticAnalyzer analyzer;
+    if (!analyzer.analyze(*program)) {
+        std::cerr << "Semantic analysis failed\n";
+        return 1;
     }
+
+    program->dump(std::cout);
 
     return 0;
 }

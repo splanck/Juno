@@ -38,6 +38,7 @@ std::vector<Token> Lexer::tokenize() {
 
     while (current < source.size()) {
         skipWhitespace();
+        if (current >= source.size()) break;
         char c = peek();
         size_t start = current;
 
@@ -48,9 +49,22 @@ std::vector<Token> Lexer::tokenize() {
                 tokens.push_back(makeToken(TokenType::KW_INT, text));
             } else if (text == "return") {
                 tokens.push_back(makeToken(TokenType::KW_RETURN, text));
+            } else if (text == "if") {
+                tokens.push_back(makeToken(TokenType::KW_IF, text));
+            } else if (text == "while") {
+                tokens.push_back(makeToken(TokenType::KW_WHILE, text));
             } else {
                 tokens.push_back(makeToken(TokenType::IDENTIFIER, text));
             }
+            continue;
+        }
+
+        if (c == '"') {
+            advance();
+            while (peek() != '"' && current < source.size()) advance();
+            std::string text = source.substr(start + 1, current - start - 1);
+            match('"');
+            tokens.push_back(makeToken(TokenType::STRING, text));
             continue;
         }
 
