@@ -17,10 +17,12 @@ private:
     char advance();
     bool match(char expected);
     void skipWhitespace();
-    Token makeToken(TokenType type, const std::string &lexeme);
+    Token makeToken(TokenType type, const std::string &lexeme, int line, int column);
 
     const std::string &source;
     size_t current{0};
+    int line{1};
+    int column{1};
 };
 
 } // namespace mylang

@@ -28,6 +28,8 @@ enum class TokenType {
 struct Token {
     TokenType type;
     std::string lexeme;
+    int line{0};
+    int column{0};
 };
 
 } // namespace mylang
