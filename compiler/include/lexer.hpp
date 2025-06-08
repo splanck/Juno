@@ -16,6 +16,7 @@ private:
     char peek() const;
     char advance();
     bool match(char expected);
+    Token lexString();
     void skipWhitespace();
     Token makeToken(TokenType type, const std::string &lexeme, int line, int column);
 

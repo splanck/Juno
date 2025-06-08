@@ -139,6 +139,11 @@ std::unique_ptr<Expr> Parser::parsePrimary() {
         lit->value = previous().lexeme;
         return lit;
     }
+    if (match(TokenType::STRING)) {
+        auto lit = std::make_unique<Literal>();
+        lit->value = previous().lexeme;
+        return lit;
+    }
     if (match(TokenType::IDENTIFIER)) {
         auto id = std::make_unique<Identifier>();
         id->name = previous().lexeme;
