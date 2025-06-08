@@ -30,6 +30,21 @@ bool Lexer::match(char expected) {
     return false;
 }
 
+Token Lexer::lexString() {
+    int tokLine = line;
+    int tokCol = column;
+    advance(); // consume opening quote
+    size_t start = current;
+    while (peek() != '"' && current < source.size()) {
+        advance();
+    }
+    std::string text = source.substr(start, current - start);
+    if (peek() == '"') {
+        advance();
+    }
+    return makeToken(TokenType::STRING, text, tokLine, tokCol);
+}
+
 void Lexer::skipWhitespace() {
     while (std::isspace(peek())) {
         advance();
@@ -78,6 +93,11 @@ std::vector<Token> Lexer::tokenize() {
             while (std::isdigit(peek())) advance();
             std::string text = source.substr(start, current - start);
             tokens.push_back(makeToken(TokenType::NUMBER, text, tokLine, tokCol));
+            continue;
+        }
+
+        if (c == '"') {
+            tokens.push_back(lexString());
             continue;
         }
 
