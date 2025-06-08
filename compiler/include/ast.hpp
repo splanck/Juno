@@ -11,6 +11,9 @@ namespace mylang {
 
 // Base AST node
 struct ASTNode {
+    int line{0};
+    int column{0};
+
     virtual ~ASTNode() = default;
     virtual void dump(std::ostream &os, int indent = 0) const = 0;
 };

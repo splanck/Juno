@@ -40,6 +40,8 @@ std::unique_ptr<FunctionDecl> Parser::parseFunction() {
     match(TokenType::RIGHT_PAREN);
     auto body = parseBlock();
     auto fn = std::make_unique<FunctionDecl>();
+    fn->line = nameTok.line;
+    fn->column = nameTok.column;
     fn->returnType = retType;
     fn->name = nameTok.lexeme;
     fn->body = std::move(body);
@@ -49,6 +51,8 @@ std::unique_ptr<FunctionDecl> Parser::parseFunction() {
 std::unique_ptr<BlockStmt> Parser::parseBlock() {
     match(TokenType::LEFT_BRACE);
     auto block = std::make_unique<BlockStmt>();
+    block->line = previous().line;
+    block->column = previous().column;
     while (!check(TokenType::RIGHT_BRACE) && !isAtEnd()) {
         block->statements.push_back(parseStatement());
     }
@@ -80,6 +84,8 @@ std::unique_ptr<Stmt> Parser::parseVarDecl() {
     }
     match(TokenType::SEMICOLON);
     auto decl = std::make_unique<VarDecl>();
+    decl->line = nameTok.line;
+    decl->column = nameTok.column;
     decl->varType = varType;
     decl->name = nameTok.lexeme;
     decl->init = std::move(init);
@@ -88,9 +94,12 @@ std::unique_ptr<Stmt> Parser::parseVarDecl() {
 
 std::unique_ptr<Stmt> Parser::parseReturn() {
     match(TokenType::KW_RETURN);
+    Token tok = previous();
     auto value = parseExpression();
     match(TokenType::SEMICOLON);
     auto stmt = std::make_unique<ReturnStmt>();
+    stmt->line = tok.line;
+    stmt->column = tok.column;
     stmt->value = std::move(value);
     return stmt;
 }
@@ -99,6 +108,8 @@ std::unique_ptr<Stmt> Parser::parseExprStmt() {
     auto expr = parseExpression();
     match(TokenType::SEMICOLON);
     auto stmt = std::make_unique<ExprStmt>();
+    stmt->line = expr ? expr->line : previous().line;
+    stmt->column = expr ? expr->column : previous().column;
     stmt->expr = std::move(expr);
     return stmt;
 }
@@ -111,6 +122,8 @@ std::unique_ptr<Expr> Parser::parseAdd() {
         Token opTok = previous();
         auto right = parseMul();
         auto bin = std::make_unique<BinaryExpr>();
+        bin->line = opTok.line;
+        bin->column = opTok.column;
         bin->left = std::move(expr);
         bin->right = std::move(right);
         bin->op = (opTok.type == TokenType::PLUS) ? BinaryOp::Add : BinaryOp::Sub;
@@ -125,6 +138,8 @@ std::unique_ptr<Expr> Parser::parseMul() {
         Token opTok = previous();
         auto right = parsePrimary();
         auto bin = std::make_unique<BinaryExpr>();
+        bin->line = opTok.line;
+        bin->column = opTok.column;
         bin->left = std::move(expr);
         bin->right = std::move(right);
         bin->op = (opTok.type == TokenType::STAR) ? BinaryOp::Mul : BinaryOp::Div;
@@ -135,18 +150,27 @@ std::unique_ptr<Expr> Parser::parseMul() {
 
 std::unique_ptr<Expr> Parser::parsePrimary() {
     if (match(TokenType::NUMBER)) {
+        Token tok = previous();
         auto lit = std::make_unique<Literal>();
-        lit->value = previous().lexeme;
+        lit->line = tok.line;
+        lit->column = tok.column;
+        lit->value = tok.lexeme;
         return lit;
     }
     if (match(TokenType::STRING)) {
+        Token tok = previous();
         auto lit = std::make_unique<Literal>();
-        lit->value = previous().lexeme;
+        lit->line = tok.line;
+        lit->column = tok.column;
+        lit->value = tok.lexeme;
         return lit;
     }
     if (match(TokenType::IDENTIFIER)) {
+        Token tok = previous();
         auto id = std::make_unique<Identifier>();
-        id->name = previous().lexeme;
+        id->line = tok.line;
+        id->column = tok.column;
+        id->name = tok.lexeme;
         return id;
     }
     if (match(TokenType::LEFT_PAREN)) {
